@@ -45,6 +45,16 @@ class PID {
   double Kp;
   double Ki;
   double Kd;
+  
+  /**
+   * Twiddle parameters
+   */
+  std::vector<double> dp;
+  int it, param_idx, N;
+  // number of steps for twiddle
+  int n_steps;
+  double total_error, best_error;
+  bool twiddle_switch;
 };
 
 #endif  // PID_H
