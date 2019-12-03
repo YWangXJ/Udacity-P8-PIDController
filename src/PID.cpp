@@ -26,14 +26,14 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   
   twiddle_switch = true;//set twiddle or not
   it = 1;  
-  N = 3;
+  N = 10;
   param_idx = 1;
-  tol = 1E-5;
-//   dp = {0.1*Kp,0.1*Ki,0.1*Kd};
-  dp = {1,1,1};
+  dp = {0.1*Kp,0.1*Ki,0.1*Kd};
+//   dp = {1,1,1};
   p = {Kp,Ki,Kd};
   n_steps = 100;
   best_error = std::numeric_limits<double>::max();
+  total_error = 0;
   added = false;
   subtracted = false;
 }
@@ -44,7 +44,7 @@ void PID::UpdateError(double cte) {
    */
   
   // initial p_error is needed for calculating the first d_error
-  
+  std::cout << "Kp: " << Kp << ", Ki: " << Ki << ", Kd: " << Kd << std::endl;  
   if (it == 1){
     p_error = cte;
   }
@@ -52,44 +52,43 @@ void PID::UpdateError(double cte) {
   p_error = cte;
   i_error += cte;
   
+  //update error after n_steps and start twiddle
   if (it % (n_steps * N)> n_steps){
     total_error += pow(cte,2);
   }
-  //total step is 2*n_eval_steps, only update after n_eval_steps
-
-  while (TotalError(dp)>tol){   
-    if (it % (N * n_steps) == 0 && twiddle_switch){   
-      std::cout << "iteration: " << it << " | total error: "<< total_error << " | best error: "<< best_error <<std::endl;
-      if (total_error < best_error){
-          best_error = total_error;        
-          dp[param_idx] *= 1.1;
-          
-          //continue to next parameter
-          param_idx = (param_idx + 1) % 3;// idx may go over 3
-          added = subtracted = false;            
-        }
-        if (!added && !subtracted){
-          AddParam(param_idx, dp[param_idx]);
-          added = true;
-        }
-      else if (added && !subtracted){
-        AddParam(param_idx, - 2 * dp[param_idx]);
-        subtracted = true;
-        }
-      else{
-        AddParam(param_idx, dp[param_idx]);
-        dp[param_idx] *=0.9;
+  
+  //total step is N*n_steps, only update after n_steps
+  if (it % (N * n_steps) == 0 && twiddle_switch){   
+    std::cout << "iteration: " << it << " | total error: "<< total_error << " | best error: "<< best_error <<std::endl;
+    if (total_error < best_error){
+        best_error = total_error;        
+        dp[param_idx] *= 1.1;
         
         //continue to next parameter
         param_idx = (param_idx + 1) % 3;// idx may go over 3
-        added = subtracted = false;
+        added = subtracted = false;            
       }
-      //next parameter, total error needs to be initialized.
-      total_error = 0;
-      std::cout << "Kp: " << Kp << ", Ki: " << Ki << ", Kd: " << Kd << std::endl;  
+      if (!added && !subtracted){
+        AddParam(param_idx, dp[param_idx]);
+        added = true;
+      }
+    else if (added && !subtracted){
+      AddParam(param_idx, - 2 * dp[param_idx]);
+      subtracted = true;
+      }
+    else{
+      AddParam(param_idx, dp[param_idx]);
+      dp[param_idx] *=0.9;
+      
+      //continue to next parameter
+      param_idx = (param_idx + 1) % 3;// idx may go over 3
+      added = subtracted = false;
     }
-    it++;
+    //next parameter, total error needs to be initialized.
+    total_error = 0;
+    std::cout << "Kp: " << Kp << ", Ki: " << Ki << ", Kd: " << Kd << std::endl;  
   }
+  it++;
 }
 
 double PID::TotalError(std::vector<double> dp) {
@@ -119,6 +118,7 @@ double PID::Output() {
  /**
   * This function returns the output value for throttle/steering
   **/
+//   std::cout << "Kp: " << Kp << ", Ki: " << Ki << ", Kd: " << Kd << std::endl;  
   total_error = - Kp * p_error - Kd * d_error - Ki * i_error;
   return total_error;
 }

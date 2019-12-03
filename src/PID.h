@@ -57,7 +57,7 @@ class PID {
   std::vector<double> dp,p;
   int it, param_idx, N;
   int n_steps;// number of steps for twiddle
-  double total_error, best_error, tol;
+  double total_error, best_error;
   bool twiddle_switch, added, subtracted;
 };
 

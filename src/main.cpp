@@ -38,7 +38,7 @@ int main() {
    * TODO: Initialize the pid variable.
    */
   pid.Init(0.3, 0.01, 3);//uncomment this for twiddle
-//   pid.Init(0.3, 0.1, 2);
+//   pid.Init(0.3, 0.01, 2);
   std::cout <<"Initialized " << std::endl;
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
@@ -70,9 +70,8 @@ int main() {
           
           steer_value = pid.Output();
           
-          // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
-                    << std::endl;
+//           // DEBUG
+          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
