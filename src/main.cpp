@@ -37,8 +37,10 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  pid.Init(0,0,0);
-  
+  pid.Init(0.3, 0.01, 3);//uncomment this for twiddle
+//   pid.Init(0.3, 0.1, 2);
+  std::cout <<"Initialized " << std::endl;
+
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -55,8 +57,8 @@ int main() {
         if (event == "telemetry") {
           // j[1] is the data JSON object
           double cte = std::stod(j[1]["cte"].get<string>());
-          double speed = std::stod(j[1]["speed"].get<string>());
-          double angle = std::stod(j[1]["steering_angle"].get<string>());
+          //double speed = std::stod(j[1]["speed"].get<string>());
+          //double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
           /**
            * TODO: Calculate steering value here, remember the steering value is
@@ -65,7 +67,8 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
           pid.UpdateError(cte);
-          steer_value = pid.TotalError();
+          
+          steer_value = pid.Output();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
