@@ -37,8 +37,8 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  pid.Init(0.3, 0.01, 3);//uncomment this for twiddle
-//   pid.Init(0.3, 0.01, 2);
+//   pid.Init(0.3, 0.01, 3);//uncomment and change twiddle_switch to true to enable twiddle
+  pid.Init(1.37989,0.0464046,15.3226);
   std::cout <<"Initialized " << std::endl;
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
@@ -70,7 +70,7 @@ int main() {
           
           steer_value = pid.Output();
           
-//           // DEBUG
+           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;

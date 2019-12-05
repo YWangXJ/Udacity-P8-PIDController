@@ -50,14 +50,16 @@ class PID {
   double Kp;
   double Ki;
   double Kd;
+  double min_output_limit = -1.0;
+  double max_output_limit = 1.0;
   
   /**
    * Twiddle parameters
    */
-  std::vector<double> dp,p;
-  int it, param_idx, N;
-  int n_steps;// number of steps for twiddle
-  double total_error, best_error;
+  std::vector<double> dp;
+  int it, param_idx, N, count;
+//   int n_steps;// number of steps for twiddle
+  double total_error, best_error,avg_error, tol;
   bool twiddle_switch, added, subtracted;
 };
 
